@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Funk-Grenzwertprüfung</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Grenzwertprüfung – Funkanwendung</h1>
+
+  <section>
+    <table class="nwa">
+      <thead>
+        <tr>
+          <th>Kriterium</th>
+          <th>Grenzwerte</th>
+          <th>Eingabe</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Frequenz (MHz)</td>
+          <td>100 – 6000</td>
+          <td><input type="number" id="frequenz" /></td>
+        </tr>
+        <tr>
+          <td>Datenrate (Mbit/s)</td>
+          <td>0.1 – 100</td>
+          <td><input type="number" id="datenrate" /></td>
+        </tr>
+        <tr>
+          <td>Reichweite (m)</td>
+          <td>1 – 1000</td>
+          <td><input type="number" id="reichweite" /></td>
+        </tr>
+        <tr>
+          <td>Latenz (ms)</td>
+          <td>0 – 100</td>
+          <td><input type="number" id="latenz" /></td>
+        </tr>
+        <tr>
+          <td>Verfügbarkeit (%)</td>
+          <td>90 – 100</td>
+          <td><input type="number" id="verfügbarkeit" /></td>
+        </tr>
+        <tr>
+          <td>Störanfälligkeit (1–5)</td>
+          <td>1 – 5</td>
+          <td><input type="number" id="störanfälligkeit" /></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button id="pruefenBtn">Prüfen</button>
+    <div id="result" class="result-box"></div>
+
+    <button id="weiterBtn" onclick="window.location.href='index_nwa.html'" disabled>Weiter zur Nutzwertanalyse</button>
+  </section>
+
+  <script src="script_gw.js"></script>
+</body>
+</html>
+
