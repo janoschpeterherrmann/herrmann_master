@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>„Mehrkriterienanalyse für Kommunikationslösungen: Funk oder Kabel?“</title>
+  <link rel="stylesheet" href="style_ahp_bright.css" />
+</head>
+<body>
+
+<div class="card">
+  <h1>Mehrkriterienanalyse für Kommunikationslösungen: Funk oder Kabel?</h1>
+  <p class="small">Schritt-für-Schritt: Hauptkategorien → Unterkriterien → Alternativen -> Gesamtergebnis</p>
+</div>
+
+<!-- Übersicht aller Kriterien -->
+<div class="card">
+  <h2>Übersicht: Haupt- und Unterkriterien</h2>
+  <table class="overview-table">
+    <tr>
+      <th>Hauptkategorie</th>
+      <th>Unterkriterien</th>
+    </tr>
+    <tr>
+      <td>funktionale Kriterien</td>
+      <td>
+        überbrückbare Entfernung<br>
+        Anzahl der Teilnehmer<br>
+        Mobilität<br>
+        Zeitverhalten<br>
+        Datenrate je Teilnehmer
+      </td>
+    </tr>
+    <tr>
+      <td>umgebungsbezogene Kriterien</td>
+      <td>
+        Einsatzort (Installationsaufwand)<br>
+        Topologie / Erweiterbarkeit<br>
+        Umweltbedingungen, EMV<br>
+        Ex-Schutz<br>
+        Lebensdauer / Verschleiß
+      </td>
+    </tr>
+    <tr>
+      <td>produktbezogene Kriterien</td>
+      <td>
+        Sicherheit<br>
+        Konfiguration, Inbetriebnahme und Betrieb<br>
+        Konstruktion<br>
+        Kosten (TCO)<br>
+        Zielmarkt
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- Schritt 1: Hauptkategorien paarweise vergleichen -->
+<div class="card">
+  <h2>1. Hauptkategorien vergleichen</h2>
+  <div id="mainCriteriaMatrix"></div>
+  <button onclick="calculateMainCriteria()">Gewichte berechnen</button>
+  <div id="mainCriteriaResults"></div>
+</div>
+
+<!-- Schritt 2: Unterkriterien pro Hauptkategorie -->
+<div class="card">
+  <h2>2. Unterkriterien vergleichen</h2>
+  <div id="subCriteriaSection"></div>
+</div>
+
+<!-- Schritt 3: Alternativen -->
+<div class="card">
+  <h2>3. Alternativen bewerten</h2>
+  <p>Die Alternativen sind festgelegt: <b>Funk</b> und <b>Kabel</b></p>
+  <button onclick="applyPreset('Brownfield')">Brownfield-Werte eintragen</button>
+  <button onclick="applyPreset('Greenfield')">Greenfield-Werte eintragen</button>
+  <div id="alternativeMatrices"></div>
+</div>
+
+<!-- Schritt 4: Ergebnis -->
+<div class="card result">
+  <h2>4. Gesamtergebnis</h2>
+  <button onclick="calculateFinalRanking()">Ranking berechnen</button>
+  <div id="finalResults"></div>
+</div>
+
+<script>
+/* ==============================
+   Datenstrukturen & Initialwerte
+   ============================== */
+
+const mainCriteria = [
+  "funktionale Kriterien",
+  "umgebungsbezogene Kriterien",
+  "produktbezogene Kriterien"
+];
+
+const subCriteria = {
+  "funktionale Kriterien": [
+    "überbrückbare Entfernung",
+    "Anzahl der Teilnehmer",
+    "Mobilität",
+    "Zeitverhalten",
+    "Datenrate je Teilnehmer"
+  ],
+  "umgebungsbezogene Kriterien": [
+    "Einsatzort (Installationsaufwand)",
+    "Topologie / Erweiterbarkeit",
+    "Umweltbedingungen, EMV",
+    "Ex-Schutz",
+    "Lebensdauer / Verschleiß"
+  ],
+  "produktbezogene Kriterien": [
+    "Sicherheit",
+    "Konfiguration, Inbetriebnahme und Betrieb",
+    "Konstruktion",
+    "Kosten (TCO)",
+    "Zielmarkt"
+  ],
+};
+
+// Immer nur Funk und Kabel
+let alternatives = ["Funk", "Kabel"];
+
+let mainCriteriaWeights = {};
+let subCriteriaWeights = {};
+let alternativeWeights = {}; 
+
+/* ==============================
+   Presets für Indoor/Outdoor
+   ============================== */
+
+// Beispiel: für jedes Unterkriterium definieren wir ein Wert-Paarvergleich Funk vs Kabel
+// Wert > 1 = Funk bevorzugt, Wert < 1 = Kabel bevorzugt
+const presetAlternatives = {
+  "Brownfield": {
+    "überbrückbare Entfernung": 3,  
+    "Anzahl der Teilnehmer": 3,
+    "Mobilität": 5,
+    "Zeitverhalten": 1/3,
+    "Datenrate je Teilnehmer": 2,
+    "Einsatzort (Installazionsaufwand)": 3,
+    "Topologie / Erweiterbarkeit": 4,
+    "Umweltbedingungen, EMV": 1/3,
+    "Ex-Schutz": 1/4,
+    "Lebensdauer / Verschleiß": 1/2,
+    "Sicherheit": 1/3,
+    "Konfiguration, Inbetriebnahme und Betrieb": 1/2,
+    "Konstruktion": 1,
+    "Kosten (TCO)": 2,
+    "Zielmarkt": 1
+  },
+  "Greenfield": {
+    "überbrückbare Entfernung": 5,
+    "Anzahl der Teilnehmer": 2,
+    "Mobilität": 7,
+    "Zeitverhalten": 1/2,
+    "Datenrate je Teilnehmer": 1,
+    "Einsatzort (Installazionsaufwand)": 1,
+    "Topologie / Erweiterbarkeit": 1,
+    "Umweltbedingungen, EMV": 1/3,
+    "Ex-Schutz": 1,
+    "Lebensdauer / Verschleiß": 1/3,
+    "Sicherheit": 1,
+    "Konfiguration, Inbetriebnahme und Betrieb": 1,
+    "Konstruktion": 1,
+    "Kosten (TCO)": 1/2,
+    "Zielmarkt": 1
+  }
+};
+
+function applyPreset(mode) {
+  const values = presetAlternatives[mode];
+  for (const sc in values) {
+    const elem = document.getElementById(`alt_${sc}_0_1`);
+    if (elem) {
+      elem.value = values[sc];
+      elem.dispatchEvent(new Event("change"));
+    }
+  }
+  alert(mode + "-Werte wurden eingetragen.");
+}
+
+/* ==============================
+   Hilfsfunktionen
+   ============================== */
+
+const saatyOptions = (selected=1) => {
+  const values = [9,8,7,6,5,4,3,2,1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9];
+  const labels = {
+    9:"9 – extrem höhere Bedeutung",
+    8:"8 – sehr bis extrem höhere Bedeutung",
+    7:"7 – sehr viel höhere Bedeutung",
+    6:"6 – deutlich bis sehr höhere Bedeutung",
+    5:"5 – deutlich höhere Bedeutung ",
+    4:"4 – moderat bis deutlich höhere Bedeutung",
+    3:"3 – moderat höhere Bedeutung",
+    2:"2 – leicht  höhere Bedeutung",
+    1:"1 – gleiche Bedeutung",
+    0.5:"1/2 – leicht niedrigere Bedeutung",
+    0.3333333333333333:"1/3 – moderat niedr. Bedeutung",
+    0.25:"1/4 – moderat bis deutlich niedr. Bedeutung",
+    0.2:"1/5 – deutlich niedr. Bedeutung",
+    0.16666666666666666:"1/6 – deutlich bis sehr niedr. Bedeutung",
+    0.14285714285714285:"1/7 – sehr viel niedr. Bedeutung",
+    0.125:"1/8 – sehr bis extrem niedr. Bedeutung",
+    0.1111111111111111:"1/9 – extrem niedr. Bedeutung"
+  };
+  return values.map(v=>`<option value="${v}" ${v===selected?'selected':''}>${labels[v]}</option>`).join("");
+};
+
+function buildComparisonMatrix(items, idPrefix) {
+  let html = `<table><tr><th></th>`;
+  items.forEach(i => html += `<th>${i}</th>`);
+  html += `</tr>`;
+  for (let r = 0; r < items.length; r++) {
+    html += `<tr><th>${items[r]}</th>`;
+    for (let c = 0; c < items.length; c++) {
+      if (r === c) {
+        html += `<td>1</td>`;
+      } else if (r < c) {
+        html += `<td><select id="${idPrefix}_${r}_${c}">${saatyOptions()}</select></td>`;
+      } else {
+        html += `<td id="${idPrefix}_${r}_${c}_mirror"></td>`;
+      }
+    }
+    html += `</tr>`;
+  }
+  html += `</table>`;
+  return html;
+}
+
+function calculateWeightsFromMatrix(items, idPrefix) {
+  const n = items.length;
+  const matrix = Array.from({length: n}, () => Array(n).fill(1));
+  for (let r = 0; r < n; r++) {
+    for (let c = 0; c < n; c++) {
+      if (r < c) {
+        matrix[r][c] = parseFloat(document.getElementById(`${idPrefix}_${r}_${c}`).value);
+        matrix[c][r] = 1 / matrix[r][c];
+      }
+    }
+  }
+  const gm = matrix.map(row => row.reduce((a,b) => a*b, 1) ** (1/n));
+  const sumGm = gm.reduce((a,b) => a+b, 0);
+  const weights = gm.map(v => v / sumGm);
+  const weightedSum = matrix.map((row,i) => row.reduce((sum,val,j) => sum + val*weights[j],0));
+  const lambdaMax = weightedSum.reduce((a,b,i) => a + b/weights[i], 0) / n;
+  const ci = (lambdaMax - n) / (n - 1);
+  const ri = {1:0,2:0,3:0.58,4:0.90,5:1.12,6:1.24,7:1.32,8:1.41,9:1.45}[n];
+  const cr = ci / ri;
+  return {weights, cr};
+}
+
+/* ==============================
+   Schritt 1: Hauptkriterien
+   ============================== */
+
+document.getElementById("mainCriteriaMatrix").innerHTML = buildComparisonMatrix(mainCriteria, "main");
+
+function calculateMainCriteria() {
+  const {weights, cr} = calculateWeightsFromMatrix(mainCriteria, "main");
+  mainCriteria.forEach((c,i) => mainCriteriaWeights[c] = weights[i]);
+  let html = "<h3>Ergebnisse Hauptkriterien</h3><ul>";
+  mainCriteria.forEach((c,i) => html += `<li>${c}: ${(weights[i]*100).toFixed(2)}%</li>`);
+  html += `</ul><p>CR = ${cr.toFixed(3)} (${cr<0.1?"OK":"Zu hoch!"})</p>`;
+  document.getElementById("mainCriteriaResults").innerHTML = html;
+  buildSubCriteriaMatrices();
+}
+
+/* ==============================
+   Schritt 2: Unterkriterien
+   ============================== */
+
+function buildSubCriteriaMatrices() {
+  let html = "";
+  for (const cat of mainCriteria) {
+    html += `<h3>${cat}</h3>`;
+    html += buildComparisonMatrix(subCriteria[cat], `sub_${cat}`);
+    html += `<button onclick="calculateSubCriteria('${cat}')">Gewichte berechnen</button>`;
+    html += `<div id="subResult_${cat}"></div>`;
+  }
+  document.getElementById("subCriteriaSection").innerHTML = html;
+}
+
+function calculateSubCriteria(cat) {
+  const {weights, cr} = calculateWeightsFromMatrix(subCriteria[cat], `sub_${cat}`);
+  subCriteriaWeights[cat] = {};
+  subCriteria[cat].forEach((sc,i) => subCriteriaWeights[cat][sc] = weights[i]);
+  let html = "<ul>";
+  subCriteria[cat].forEach((sc,i) => html += `<li>${sc}: ${(weights[i]*100).toFixed(2)}%</li>`);
+  html += `</ul><p>CR = ${cr.toFixed(3)} (${cr<0.1?"OK":"Zu hoch!"})</p>`;
+  document.getElementById(`subResult_${cat}`).innerHTML = html;
+  buildAlternativeMatrices();
+}
+
+/* ==============================
+   Schritt 3: Alternativen
+   ============================== */
+
+//Alte Funktion, bei der jeder paar Vergleich per Klick erfolgen muss
+
+/*
+function buildAlternativeMatrices() {
+  let html = "";
+  for (const cat of mainCriteria) {
+    for (const sc of subCriteria[cat]) {
+      html += `<h4>${sc}</h4>`;
+      html += buildComparisonMatrix(alternatives, `alt_${sc}`);
+      //html += `<button onclick="calculateAlternative('${sc}')">Gewichte berechnen</button>`;
+      html += `<div id="altResult_${sc}"></div>`;
+    }
+  }
+  document.getElementById("alternativeMatrices").innerHTML = html;
+}
+*/
+
+//Neue Funktion, mit einem gemeinsamer Button am Ende
+
+function buildAlternativeMatrices() {
+  let html = "";
+  for (const cat of mainCriteria) {
+    for (const sc of subCriteria[cat]) {
+      html += `<h4>${sc}</h4>`;
+      html += buildComparisonMatrix(alternatives, `alt_${sc}`);
+      html += `<div id="altResult_${sc}"></div>`;
+    }
+  }
+  // EIN gemeinsamer Button am Ende
+  html += `<button onclick="calculateAllAlternatives()">Alle Gewichte berechnen</button>`;
+  document.getElementById("alternativeMatrices").innerHTML = html;
+}
+
+// Neue Funktion: berechnet alle Alternativen-Matrizen
+function calculateAllAlternatives() {
+  for (const cat of mainCriteria) {
+    for (const sc of subCriteria[cat]) {
+      calculateAlternative(sc);
+    }
+  }
+}
+
+function calculateAlternative(sc) {
+  const {weights, cr} = calculateWeightsFromMatrix(alternatives, `alt_${sc}`);
+  alternativeWeights[sc] = {};
+  alternatives.forEach((a,i) => alternativeWeights[sc][a] = weights[i]);
+  let html = "<ul>";
+  alternatives.forEach((a,i) => html += `<li>${a}: ${(weights[i]*100).toFixed(2)}%</li>`);
+  //html += `</ul><p>CR = ${cr.toFixed(3)} (${cr<0.1?"OK":"Zu hoch!"})</p>`;
+  document.getElementById(`altResult_${sc}`).innerHTML = html;
+}
+
+
+
+/* ==============================
+   Schritt 4: Gesamtranking
+   ============================== */
+
+function calculateFinalRanking() {
+  const scores = {};
+  alternatives.forEach(a => scores[a] = 0);
+  for (const cat of mainCriteria) {
+    for (const sc of subCriteria[cat]) {
+      const globalWeight = mainCriteriaWeights[cat] * subCriteriaWeights[cat][sc];
+      if (alternativeWeights[sc]) {
+        for (const alt of alternatives) {
+          scores[alt] += alternativeWeights[sc][alt] * globalWeight;
+        }
+      }
+    }
+  }
+  let html = "<h3>Endergebnis</h3><ol>";
+  Object.entries(scores).sort((a,b) => b[1]-a[1]).forEach(([alt,score]) => {
+    html += `<li>${alt}: ${(score*100).toFixed(2)}%</li>`;
+  });
+  html += "</ol>";
+  document.getElementById("finalResults").innerHTML = html;
+}
+</script>
+
+</body>
+</html>
