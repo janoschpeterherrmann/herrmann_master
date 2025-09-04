@@ -1,0 +1,66 @@
+body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f9f9f9;
+    }
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: #eee;
+    }
+    input, select, button {
+      padding: 5px;
+      margin: 5px 0;
+    }
+    .small {
+      font-size: 0.9em;
+      color: #555;
+    }
+    .result {
+      background: #eef9ee;
+    }
+    select {
+      max-width: 220px;        /* Dropdown-Begrenzung */
+      white-space: normal;     /* Zeilenumbruch in Optionstexten erlauben */
+      font-size: 0.85rem;      /* etwas kleinere Schrift */
+    }
+
+    select option {
+      white-space: normal;     /* auch innerhalb der Optionen umbrechen */
+    }
+
+    .overview-table {
+      width: 100%;
+      max-width: 900px; /* maximale Rahmenbreite */
+      border-collapse: collapse;
+      margin: 0 auto;
+    }
+    .overview-table th, .overview-table td {
+      border: 1px solid #ccc;
+      padding: 6px 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+    .overview-table th {
+      background-color: #f2f2f2;
+    }
+
+
