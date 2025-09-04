@@ -2,62 +2,170 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Funk-Grenzwertprüfung</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style_ahp_bright.css" />
 </head>
 <body>
-  <h1>Grenzwertprüfung – Funkanwendung</h1>
 
-  <section>
-    <table class="nwa">
-      <thead>
-        <tr>
-          <th>Kriterium</th>
-          <th>Grenzwerte</th>
-          <th>Eingabe</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Frequenz (MHz)</td>
-          <td>100 – 6000</td>
-          <td><input type="number" id="frequenz" /></td>
-        </tr>
-        <tr>
-          <td>Datenrate (Mbit/s)</td>
-          <td>0.1 – 100</td>
-          <td><input type="number" id="datenrate" /></td>
-        </tr>
-        <tr>
-          <td>Reichweite (m)</td>
-          <td>1 – 1000</td>
-          <td><input type="number" id="reichweite" /></td>
-        </tr>
-        <tr>
-          <td>Latenz (ms)</td>
-          <td>0 – 100</td>
-          <td><input type="number" id="latenz" /></td>
-        </tr>
-        <tr>
-          <td>Verfügbarkeit (%)</td>
-          <td>90 – 100</td>
-          <td><input type="number" id="verfügbarkeit" /></td>
-        </tr>
-        <tr>
-          <td>Störanfälligkeit (1–5)</td>
-          <td>1 – 5</td>
-          <td><input type="number" id="störanfälligkeit" /></td>
-        </tr>
-      </tbody>
-    </table>
+<div class="card">
+  <h1>Grenzwert- und Show-Stopper-Prüfung – Funkanwendung</h1>
+  <p class="small">Schritt-für-Schritt: Hauptkategorien → Unterkriterien → Alternativen → Gesamtergebnis</p>
+</div>
 
-    <button id="pruefenBtn">Prüfen</button>
-    <div id="result" class="result-box"></div>
+<div class="card">
+  <h2>Übersicht: Bitte mit der Nutzereingabe starten</h2>
+  <table class="nwa">
+    <thead>
+      <tr>
+        <th>Kriterium</th>
+        <th>Grenzwerte / Show-Stopper</th>
+        <th>Eingabe</th>
+        <th>Begründung</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Frequenz (MHz)</td>
+        <td>100 – 6000</td>
+        <td><input type="number" id="frequenz"></td>
+        <td>Regulatorische Beschränkungen oder fehlende Frequenzfreigaben können den Einsatz in bestimmten Regionen verhindern.</td>
+      </tr>
+      <tr>
+        <td>Datenrate (Mbit/s)</td>
+        <td>0.1 – 100</td>
+        <td><input type="number" id="datenrate"></td>
+        <td>Unzureichende Datenrate kann Anwendungen mit hohem Bandbreitenbedarf (z. B. Bildverarbeitung) ausschließen.</td>
+      </tr>
+      <tr>
+        <td>Reichweite (m)</td>
+        <td>1 – 1000</td>
+        <td><input type="number" id="reichweite"></td>
+        <td>Zu geringe Reichweite schränkt den Einsatz in großflächigen oder schwer zugänglichen Anlagen stark ein.</td>
+      </tr>
+      <tr>
+        <td>Latenz (ms)</td>
+        <td>0 – 100</td>
+        <td><input type="number" id="latenz"></td>
+        <td>Fehlende Echtzeitfähigkeit bzw. hohe Latenzen verhindern zeitkritische Anwendungen wie Motion Control oder Safety.</td>
+      </tr>
+      <tr>
+        <td>Verfügbarkeit (%)</td>
+        <td>90 – 100</td>
+        <td><input type="number" id="verfügbarkeit"></td>
+        <td>Geringe Verfügbarkeit reduziert die Betriebssicherheit und führt in hochkritischen Prozessen zum Ausschluss.</td>
+      </tr>
+      <tr>
+        <td>Störanfälligkeit</td>
+        <td>ja (Show-Stopper bei hoher Störanfälligkeit)</td>
+        <td>
+          <select id="störanfälligkeit">
+            <option value="nein">nein</option>
+            <option value="ja">ja</option>
+          </select>
+        </td>
+        <td>Hohe Störanfälligkeit durch EMV oder Umgebungsbedingungen kann den zuverlässigen Betrieb verhindern.</td>
+      </tr>
+      <tr>
+        <td>Ex-Schutz</td>
+        <td>ja erforderlich</td>
+        <td>
+          <select id="exschutz">
+            <option value="ja">ja</option>
+            <option value="nein">nein</option>
+          </select>
+        </td>
+        <td>Fehlen von ATEX-/IECEx-Zulassungen verhindert Einsatz in explosionsgefährdeten Bereichen.</td>
+      </tr>
+      <tr>
+        <td>Sicherheit</td>
+        <td>ja erforderlich</td>
+        <td>
+          <select id="sicherheit">
+            <option value="ja">ja</option>
+            <option value="nein">nein</option>
+          </select>
+        </td>
+        <td>Fehlende Verschlüsselung oder unzureichende Standards (z. B. WPA3, IEC 62443) stellen ein Sicherheitsrisiko dar.</td>
+      </tr>
+      <tr>
+        <td>Robustheit</td>
+        <td>ja erforderlich</td>
+        <td>
+          <select id="robustheit">
+            <option value="ja">ja</option>
+            <option value="nein">nein</option>
+          </select>
+        </td>
+        <td>Unzureichende Resistenz gegenüber Schock, Vibration oder Temperaturgrenzen limitiert den Einsatz in der Industrie.</td>
+      </tr>
+    </tbody>
+  </table>
 
-    <button id="weiterBtn" onclick="window.location.href='index_nwa.html'" disabled>Weiter zur Nutzwertanalyse</button>
-  </section>
+  <button id="pruefenBtn">Prüfen</button>
+  <div id="result" class="result-box"></div>
+  <button id="weiterBtn" onclick="window.location.href='index_ahp.html'" disabled>Weiter zur AHP-Analyse</button>
+</div>
 
-  <script src="script_gw.js"></script>
+<script>
+  // numerische Grenzwerte
+  const grenzen = {
+    frequenz: { min: 100, max: 6000 },
+    datenrate: { min: 0.1, max: 100 },
+    reichweite: { min: 1, max: 1000 },
+    latenz: { min: 0, max: 100 },
+    verfügbarkeit: { min: 90, max: 100 }
+  };
+
+  // Ja/Nein-Kriterien (Show-Stopper)
+  const showStopper = ["störanfälligkeit", "exschutz", "sicherheit", "robustheit"];
+
+  document.getElementById("pruefenBtn").addEventListener("click", () => {
+    let alleGueltig = true;
+    const resultDiv = document.getElementById("result");
+
+    // numerische Felder prüfen
+    Object.keys(grenzen).forEach(id => {
+      const input = document.getElementById(id);
+      const value = parseFloat(input.value);
+      const { min, max } = grenzen[id];
+
+      if (isNaN(value) || value < min || value > max) {
+        input.classList.remove("valid");
+        input.classList.add("invalid");
+        alleGueltig = false;
+      } else {
+        input.classList.remove("invalid");
+        input.classList.add("valid");
+      }
+    });
+
+    // Ja/Nein-Kriterien prüfen
+    showStopper.forEach(id => {
+      const select = document.getElementById(id);
+      if (select.value !== "ja") {
+        select.classList.remove("valid");
+        select.classList.add("invalid");
+        alleGueltig = false;
+      } else {
+        select.classList.remove("invalid");
+        select.classList.add("valid");
+      }
+    });
+
+    // Ergebnis ausgeben
+    if (alleGueltig) {
+      resultDiv.textContent = "✅ Eingabe lässt Funkanwendung i.d.R. zu.";
+      resultDiv.style.color = "green";
+      document.getElementById("weiterBtn").disabled = false;
+    } else {
+      resultDiv.textContent = "❌ Nicht für Funk-Technologie geeignet.";
+      resultDiv.style.color = "red";
+      document.getElementById("weiterBtn").disabled = true;
+    }
+  });
+</script>
 </body>
 </html>
+
 
